@@ -1,0 +1,12 @@
+# kegg circadian rhythm genes
+#
+Gene.Name	Gene.ID
+vri	FBgn0016076
+Pdp1	FBgn0016694
+dco	FBgn0002413
+sgg	FBgn0003371
+per	FBgn0003068
+gskt	FBgn0046332
+tim	FBgn0014396
+Clk	FBgn0023076
+cyc	FBgn0023094
