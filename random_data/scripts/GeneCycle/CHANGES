@@ -1,0 +1,68 @@
+        CHANGES IN GeneCycle VERSION 1.1.3
+- inst/doc/wichert-table2.R missing comment symbol added
+- R/robust.spectrum.R explicit require command removed
+
+		CHANGES IN GeneCycle VERSION 1.1.2
+- Fixed typo in help of avgp (avpg -> avgp)
+- Repackaged to compress .rda.
+
+		CHANGES IN GeneCycle VERSION 1.1.1
+
+- major bug fixes for the known-frequency robust
+  regression -based periodicity detector (rendering 
+  the implementation useless). Mainly:
+
+  1) misindexing of a matrix crashed the evaluation
+     of p-values
+
+  2) squaring of one of the two sinusoidal coefficients
+     was missing in evaluating the test statistic
+
+
+		CHANGES IN GeneCycle VERSION 1.1.0
+
+- major update, maintainer changed to Miika Ahdesmaki
+
+  1) implements now also the robust regression based periodicity
+     detection method introduced in Ahdesmaki et al. (2007)
+
+
+		CHANGES IN GeneCycle VERSION 1.0.4
+
+- this update fixes two bugs discoved by Sue Wilson 
+  (Australian National University):
+
+  1) in fisher.g.test() the intensity belonging to
+     the frequency \pi (or 1/2) is not any more taken
+     into account when computing the g-statistic.
+     In previous versions for an even number of time points
+     thw peak at \pi was incorrectly included.
+
+  2) similary, in robust.g.test() the frequency at zero
+     was previously (incorrectly) included into the the g-statistic.
+
+
+		CHANGES IN GeneCycle VERSION 1.0.3
+
+- small changes to make the package work with fdrtool version 1.2.1.
+
+
+		CHANGES IN GeneCycle VERSION 1.0.2
+
+- the package was modifed in response to changes in the "fdrtool" package.
+  Specifically, the examples on the help pages and also in the "doc" directly
+  were modified to work with fdrtool version 1.1.0.
+
+
+		CHANGES IN GeneCycle VERSION 1.0.1
+		
+- bug fix in function is.constant()		
+
+		
+		CHANGES IN GeneCycle VERSION 1.0.0
+
+
+This is the first standalone release (9 August 2006).
+Previously, the functions available in this package were part of
+the GeneTS package (version 2.10.2).
+      

@@ -1,0 +1,28 @@
+Package: rain
+Type: Package
+Title: Rhythmicity Analysis Incorporating Non-parametric Methods
+Version: 1.16.0
+Date: 2015-09-01
+Author: Paul F. Thaben, Pål O. Westermark
+Maintainer: Paul F. Thaben <paul.thaben@charite.de>
+Description: This package uses non-parametric methods to detect rhythms
+        in time series. It deals with outliers, missing values and is
+        optimized for time series comprising 10-100 measurements. As it
+        does not assume expect any distinct waveform it is optimal or
+        detecting oscillating behavior (e.g. circadian or cell cycle)
+        in e.g. genome- or proteome-wide biological measurements such
+        as: micro arrays, proteome mass spectrometry, or metabolome
+        measurements.
+License: GPL-2
+Depends: R (>= 2.10), gmp, multtest
+biocViews: TimeCourse, Genetics, SystemsBiology, Proteomics,
+        Microarray, MultipleComparison
+Suggests: lattice, BiocStyle
+Encoding: UTF-8
+git_url: https://git.bioconductor.org/packages/rain
+git_branch: RELEASE_3_8
+git_last_commit: b0ffed8
+git_last_commit_date: 2018-10-30
+Date/Publication: 2018-10-30
+NeedsCompilation: no
+Packaged: 2018-10-31 00:21:53 UTC; biocbuild

@@ -1,0 +1,37 @@
+---
+fontsize: 10pt
+output: html_document
+fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## VERTEBRATES
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 5, out.width = '60%', fig.align = "center", comment=NA}
+main.dir <- "~/Documents/rhythm_detection_benchmark"
+
+files.dir <- paste(main.dir, "RESULTS/ortho_pval_distrib_images", sep="/")
+plots.list <- list.files(files.dir, pattern = ".rds")
+plots.list <- paste(files.dir, plots.list, sep = "/")
+
+### VERTEBRATES
+plots.list.bis <- plots.list[grep("mouse|baboon|rat|zebrafish", plots.list)]
+```
+
+
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 8, out.width = '60%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+plots.list.bis.pval <- plots.list.bis[grep("default.pvalue", plots.list.bis)]
+nb.plots.1 <- length(plots.list.bis.pval)
+for (i in 1:length(plots.list.bis.pval)) {
+  fig <- readRDS(plots.list.bis.pval[i])
+  print(fig)
+  key <- paste("**Fig. S", i, "**", sep="")
+  cat(key)
+}
+```
+

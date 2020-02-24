@@ -1,0 +1,22 @@
+normalization_step,normalization_method
+per_gene,brown
+per_orthologs_group,min(bonferroni_pvalues)
+"	",
+"	",
+"	",
+"per_gene normalization is needeed for microarray data, in case of several data (ProbIDs or Transcripts) per gene. Using the method : 	",
+"mean	",
+"brown : EBM does not assume any underlying distribution of the data, but instead uses an empirical cumulative distribution function (ecdf) on the (transformed) data in X to estimate the covariance. Performs well when combining P-values on noisy data with internal correlation structure.	",
+"fisher : combines  P-values assuming statistical independence between the k P-values	",
+"kost: employs a polynomial approximation to calculate the covariance among the k variables based on the data in X. The covariance estimate is a measurement of statistical dependence between the k P-values and used to re-scale the Ð_2 distribution from which the combined P-value is calculated. Kost_ã_s approximation assumes normally distributed underlying data.	",
+"	",
+"(Poole W, Gibbs DL, Shmulevich I, Bernard B, Knijnenburg TA. Combining dependent P-values with an empirical adaptation of Brown_ã_s method. Bioinformatics. 2016;32(17):i430-i436. doi:10.1093/bioinformatics/btw438.)	",
+"	",
+"	",
+"	",
+"per_orthologs_group normalization is needeed when one gene of species 1 has several orthologs in species 2. P-values of orthologs of species 2 are normalized by :	",
+"fisher : combines  P-values assuming statistical independence between the k P-values	",
+"sidak: utilizes a test based on the minimum p-value m=min(p1..pK), namely the adjustment theta	",
+"min(bonferroni_pvalues) : transform pvalues in bonferroni_pvalues, then keep the minimum one. ",
+,
+"Yi et al. Genome Biology (2018) 19:53 	",

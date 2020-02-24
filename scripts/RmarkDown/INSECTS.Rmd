@@ -1,0 +1,95 @@
+---
+fontsize: 10pt
+output: html_document
+fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# INSECTS
+
+## Density distribution of raw and default *p*-values
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 5, out.width = '60%', fig.align = "center", comment=NA}
+main.dir <- "~/Documents/rhythm_detection_benchmark"
+
+files.dir <- paste(main.dir, "RESULTS/pval_distrib_images", sep="/")
+plots.list <- list.files(files.dir, pattern = ".rds")
+plots.list <- paste(files.dir, plots.list, sep = "/")
+
+### INSECTS
+plots.list.bis <- plots.list[grep("drosophila|aedes|anopheles", plots.list)]
+```
+
+
+
+### default *p*-values
+```{r, echo=FALSE, fig.height = 8, fig.width = 5, out.width = '35%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+plots.list.bis.pval <- plots.list.bis[grep("default.pvalue", plots.list.bis)]
+nb.plots.1 <- length(plots.list.bis.pval)
+for (i in 1:length(plots.list.bis.pval)) {
+  fig <- readRDS(plots.list.bis.pval[i])
+  print(fig)
+  key <- paste("**Fig. S", i, "**", sep="")
+  cat(key)
+}
+```
+
+### raw *p*-values
+```{r, echo=FALSE, fig.height = 8, fig.width = 5, out.width = '35%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+plots.list.bis.pval <- plots.list.bis[grep("raw.pvalue", plots.list.bis)]
+nb.plots.2 <- length(plots.list.bis.pval)
+nb.plots.2 <- nb.plots.1+nb.plots.2
+for (i in 1:length(plots.list.bis.pval)) {
+  fig <- readRDS(plots.list.bis.pval[i])
+  print(fig)
+  key <- paste("**Fig. S", i+nb.plots.1, "**", sep="")
+  cat(key)
+}
+```
+
+
+
+## Density distribution of *p*-values: rhythmic vs non-rhythmic orthologs
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 8, out.width = '60%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+files.dir <- paste(main.dir, "RESULTS/ortho_pval_distrib_images", sep="/")
+plots.list <- list.files(files.dir, pattern = ".rds")
+plots.list <- paste(files.dir, plots.list, sep = "/")
+
+### INSECTS
+plots.list.bis <- plots.list[grep("drosophila|aedes|anopheles", plots.list)]
+nb.plots.3 <- length(plots.list.bis)
+nb.plots.3 <- nb.plots.2+nb.plots.3
+for (i in 1:length(plots.list.bis)) {
+  fig <- readRDS(plots.list.bis[i])
+  print(fig)
+  key <- paste("**Fig. S", i+nb.plots.2, "**", sep="")
+  cat(key)
+}
+```
+
+
+
+
+## Variation of the proportion A/B as a function of the number of orthologs detected rhythmic
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 9, out.width = '48%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+files.dir <- paste(main.dir, "RESULTS/proportion_rhythmic_orthologs_images", sep="/")
+plots.list <- list.files(files.dir, pattern = ".rds")
+plots.list <- paste(files.dir, plots.list, sep = "/")
+
+### INSECTS
+plots.list.bis <- plots.list[grep("drosophila|aedes|anopheles", plots.list)]
+for (i in 1:length(plots.list.bis)) {
+  fig <- readRDS(plots.list.bis[i])
+  print(fig)
+  key <- paste("**Fig. S", i+nb.plots.3, "**", sep="")
+  cat(key)
+}
+```
+
+

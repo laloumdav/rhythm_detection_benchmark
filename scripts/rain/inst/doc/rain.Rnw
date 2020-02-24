@@ -1,0 +1,289 @@
+% 
+\documentclass[a4paper]{article}
+
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@
+%\VignetteIndexEntry{Rain Usage}
+
+\title{Usage of package rain}
+\author{Paul F. Thaben}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+\maketitle
+
+\tableofcontents
+
+
+
+\section{Introduction}
+Rain is an algorithm that detects rhythms in time series. It tests against
+umbrella alternatives (Mack \& Wolfe (1981)) to detect rhythmic rising and 
+falling patterns.
+
+
+\section{Usage}
+
+\subsection{General Usage}
+To demonstrate rains capability we generate 2 example time series. This set of 
+time series must be given as a matrix, with time points as rows and
+series as columns. 
+
+<<fig=TRUE, width=4, height=3>>=
+set.seed(123)
+times <- c(1: 24) * 2
+sin <- 1 + 0.5 * sin(times / 24 * 2 * pi) + rnorm(24, 0, 0.3)
+saw <- rep(13:24 / 18 , 2) + rnorm(24, 0, 0.3)
+measure <- cbind(sin, saw)
+require('lattice')
+xyplot(t(measure)~rep(times, each=2) | c('sin', 'saw'),
+    layout = c(1, 2), type = 'o', xlab = 'time', ylab = 'value', cex.lab = 0.6)
+@
+
+This matrix is entered into rain with some additional parameters, which are 
+described below.
+
+<<>>=
+require(rain)
+rainresult <- rain(measure, period=24, 
+                deltat=2, peak.border=c(0.1,0.9),
+                verbose=FALSE
+)
+rainresult
+@
+
+To evaluate a time series in rain, the specification of the searched period 
+length and the sample interval are essential:
+
+\subsubsection*{Key arguments for calling rain }
+
+\begin{tabular}{ p{3cm} p{8cm} }
+\tt{x} & The set of time series as a matrix, one column per series, one row
+per time point \\
+\tt{period} & period to test for \\
+\tt{period.delta} & if a range of periods should be searched this interval is
+specified according to [\tt period $-$ period.delta; 
+period $+$ period.delta\sf ] 
+\\
+\tt{deltat} & time difference between two data points. \tt deltat \sf uses the
+same scale as \tt period \sf and \tt period.delta \sf
+\end{tabular}
+
+Additional parameters facilitate the testing of more complex time series, and 
+take care of special properties of the time series, such as missing values or
+damping effects.
+
+\subsubsection*{Other arguments} 
+
+\begin{tabular}{ p{3cm} p{8cm} }
+\tt{na.rm} & if the measurements contain NA values, these are treated as never
+measured and null distributions for all series  are calculated individually 
+(takes longer)\\ 
+\tt{method} & '\tt{independent}\sf' or '\tt{longitudinal}\sf': different 
+variants of data interpretation (see subsection) \\
+\tt{nr.series} \sf and \tt{measure.sequence} \sf & different possibilities to
+specify multiple experiments and irregular time series (see subsection) \\
+\tt{peak.border} & range of skewness to look for (see subsection) \\
+\tt{verbose} & logical value: show progress status while running
+\end{tabular}
+
+\subsection{Application on a real dataset} 
+
+The usage on a realistic dataset is similar. As an example we use the high 
+throughput sequencing profiles of gene expression in mouse liver from 
+Menet et. al. 2012:
+
+<<>>=
+data(menetRNASeqMouseLiver)
+
+colnames(menetRNASeqMouseLiver)
+@
+We have one series per gene, and for each gene 12 measurement at 6 different 
+time points, so each time point has two independent repeats. To treat these 
+repeats correctly, we have to set \tt{nr.series=2} \sf or 
+\tt{measure.sequence=c(2,2,2,2,2,2)}\sf. 
+Furthermore, data have to be transposed as they contain one column per time 
+point. 
+<<fig=TRUE>>=
+results <- rain(t(menetRNASeqMouseLiver), deltat=4, period=24, nr.series=2,
+                peak.border=c(0.3, 0.7), verbose=FALSE) 
+
+best <- order(results$pVal)[1:10]
+
+xyplot(as.matrix(menetRNASeqMouseLiver
+            [best, (0:5 * 2 + rep(c(1, 2), each = 6))]) 
+        ~rep(0:11 * 4 + 2, each = 10) |rownames(menetRNASeqMouseLiver)[best], 
+        scales = list(y = list(relation = 'free')),
+        layout = c(2, 5), type = 'b', pch = 16, xlab = 'time', 
+        ylab = 'expression value', cex.lab = 1)
+@
+
+The Top 10 Results showing, besides Per1, a gene of the central molecular 
+mechanism that generates daily oscillations in vertebrate cells, also some 
+genes with highly asymmetric oscillations (ni-2, Rnf144b, Mtrr) which might be 
+overseen when only sine waves are assumed. 
+
+
+
+
+\subsection{Dataset format and specification}
+The algorithm allows exact calculation also for time series with multiple
+measurements of the same time points or missing values. These properties can
+be triggered by the argument \tt{nr.series} \sf{and} 
+\tt{measure.sequence}\sf{.}
+Also, \tt{x} \sf{has} constraints which are necessary to interpret all in a
+correct manner.
+This section explains what is possible and how the settings are provided to
+the function.
+\subsubsection*{Regular time series, no repeats}
+In the simplest case where all time points are equally spaced and there is one
+measurement per time point, the default settings are valid.
+Then the ordering of the the rows in the matrix \tt x \sf is equal to the 
+temporal order of the measurements.
+\subsubsection*{Regular time series, regular repeats}
+A regular time series is measured with multiple independent repeats with the
+the same number of repeats per time point.
+The number of repeats for each time series is provided by the argument
+\tt{nr.series}\sf{.} In the matrix \tt{x}\sf{, the} repeats are ordered as 
+followed 
+\paragraph{}
+\tt{}
+\begin{tabular}{ p{1cm} p{1cm} || }
+time & repeat \\
+\hline \hline
+1 & 1 \\ 
+1 & 2 \\ \hline
+2 & 1 \\ 
+2 & 2 \\ \hline
+3 & 1 \\ 
+3 & 2 \\ \hline
+\end{tabular}
+\sf{}
+\subsubsection*{Regular time series, irregular repeats}
+If the number of repeats differ between the time points, the number of repeats
+is stated for each time point individually using the argument
+\tt{measure.sequence}\sf{.} The numbers of repeats for the time points are
+stated in temporal order. The matrix \tt{x} \sf{is} created according to the
+same logic as for regular repeats.
+\paragraph{}
+Example: A time series with the \tt{measure.sequence} \sf{\{1, 3, 1, 2\}} have 
+a corresponding matrix \tt{x}
+\paragraph{}
+\begin{tabular}{ p{1cm} p{1cm} ||}
+time & repeat\\
+\hline \hline
+1 & 1 \\ \hline
+2 & 1 \\ 
+2 & 2 \\ 
+2 & 3 \\ \hline
+3 & 1 \\ \hline
+4 & 1 \\ 
+4 & 2 \\ \hline
+\end{tabular}
+\sf{}
+\subsubsection*{Irregular time series}
+If the time series is not equally spaced it can be regularized by introducing
+time points with zero repeats. This may be combined with any of the above
+repeat settings.
+\paragraph{}
+Example: A series measured at times \{1, 3, 4, 6\} is usable with the
+\tt{measure.sequence}\sf \{1, 0, 1, 1, 0, 1\} and a matrix \tt{ x}
+\paragraph{}
+\begin{tabular}{ p{1cm} p{1cm} || }
+time & repeat \\
+\hline \hline
+1 & 1 \\ \hline \hline
+3 & 1 \\ \hline
+4 & 2 \\ \hline \hline
+6 & 3 \\ \hline
+\end{tabular}
+\sf{}
+%\subsubsection*{Fine-grained phase estimation}
+%To allow phases not only at the time points measured but also in the points
+%between, you could blow up the \tt{measure.sequence} \sf{}with virtual empty
+%time points with zero repeats between each of the real measurement 
+%time points.
+
+\clearpage
+\subsection{Peak shape definition and output}
+A key advantage of rain is the possibility to detect arbitrarily
+asymmetric oscillations. 
+\subsubsection*{Argument}
+The limits of the asymmetry are controlled via the \tt{peak.border}
+\sf{argument}. The argument consists of a vector with 2 numbers between 0 and
+1. It assigns an interval of possible positions of the peak between two 
+troughs.
+\paragraph{}
+Example for a peak at the point 0.3 and the interval c(0.2, 0.8)
+\begin{center}
+\setkeys{Gin}{width=0.4\textwidth}
+<<fig = TRUE, width=3, height=2.5, echo = FALSE>>=
+plot(NULL, NULL, xlim = c(0, 1),ylim = c(0, 1), bty = 'n', xaxt = "n", 
+    yaxt = "n", xlab = '', ylab = '', mar=c(0,0,1,0))
+lines(c(0.2, 0.8), c(1.02, 1.02), lwd = 15, col = 'grey85', lend = 1)
+lines(c(0, 0.3, 1), c(0, 1, 0), lwd = 2)
+axis(3, c(0, 0.3, 1), labels = c('0', '', '1'), cex = 0.6)
+text(0.65, 1.2, "c(0.2, 0.8)", col='grey75', xpd=TRUE)
+@
+\end{center}
+The possible phases are mapped to the time points in the measurement by 
+rounding
+down/up to the next measurement time point for the lower/upper border.
+\subsubsection*{Output}
+The best matching peak shape is given in the \tt{} peak.shape\sf{} column in 
+the result array. It is the time between a peak an the next trough calculated 
+by the time points and the \tt{}deltat\sf{} argument. 
+\paragraph{}
+As an example lets have 
+a second look on the first running example with artificial time series. There 
+is an sine wave with symmetric shape and a sawtooth shaped time series, with a 
+long rising and a short falling part. The result table reflects this:
+<<>>=
+rainresult
+@
+In the sine wave the falling part of the best matching model contains 10 of 
+24 so approximately the half of the time points from one period. The sawtooth 
+shaped series has a \tt peak.shape = 2 \sf so only 2 of 24 time points are 
+in the falling part of the oscillation.
+
+\subsection{"longitudinal" versus "independent"}
+There are different ways to apply the umbrella statistic on time series. The
+optimal method depends on the experimental setting.
+
+\subsubsection*{longitudinal}
+Used for time series sampled from the same individual or cell culture. 
+Resistant to artifacts such as trends or dampening of oscillations.
+
+In this variant there is no reordering of the samples. If the time series 
+contains more than one period, multiple peaks
+are treated independently, resulting in insensitivity with respect to 
+different amplitudes (damping) and underlying trends. Detection of strong 
+asymmetries could lead to false positives that in fact are pure trends.
+
+\subsubsection*{independent}
+Used for time series with time points sampled independently from different
+biological specimen.  An example would be an experiment in which different
+animals are scarified and assayed at each time point.
+
+In this variant, the statistic is the same for each combination of
+\tt{} period \sf and \tt{}peak.shape\sf{}. Time points at the same phase are
+treated as independent repeats.
+
+\section{References}
+
+Mack, G. A., \& Wolfe, D. A. (1981). K-Sample Rank Tests for Umbrella
+Alternatives. 
+\emph{Journal of the American Statistical Association},
+\textbf{76(373)}, 175--181.
+
+
+Menet, J. S., Rodriguez, J., Abruzzi, K. C., and Rosbash, M.
+(2012). Nascent-Seq reveals novel features of mouse circadian
+transcriptional regulation. \emph{eLife}, \textbf{1(0)}, e00011.
+doi:10.7554/eLife.00011
+
+
+\end{document}

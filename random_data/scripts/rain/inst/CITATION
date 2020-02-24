@@ -1,0 +1,16 @@
+citHeader("To cite package 'rain' in publications use:")
+
+citEntry(entry="article",
+	journal="Journal of Biological Rhythms",
+        title = "Detecting Rhythms in Time Series with RAIN",
+        author = personList(as.person("Paul F. Thaben"),
+                            as.person("Pål O. Westermark")),
+        year = 2014,
+        volume = 29,
+        number = 6,
+        pages = "391--400",
+        doi = "10.1177/0748730414553029",
+        textVersion = paste(
+        "Paul F. Thaben and Pål O. Westermark.",
+        "Detecting Rhythms in Time Series with RAIN. ",
+        "J Biol Rhythms. 2014 Dec; 29(6): 391–400"))

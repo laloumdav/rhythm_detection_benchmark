@@ -1,0 +1,5 @@
+Non parametric detection of oscillating behavior. 
+The usage of an extended umbrella-algorithm allows to detect rhythmicity in 
+limited (10-100 time points) time series of genome wide scale. Due to 
+flexible assumptions the algorithm detect symmetric (sinusoidal) and asymmetric 
+(saw tooth) wave forms equally well.

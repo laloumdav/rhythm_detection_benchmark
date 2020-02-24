@@ -1,0 +1,67 @@
+---
+fontsize: 10pt
+output: html_document
+fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## VERTEBRATES
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 5, out.width = '60%', fig.align = "center", comment=NA, warning=FALSE, message=FALSE}
+library(cowplot)
+main.dir <- "~/Documents/rhythm_detection_benchmark"
+
+files.dir <- paste(main.dir, "RESULTS/proportion_rhythmic_orthologs_images", sep="/")
+plots.list <- list.files(files.dir, pattern = ".rds")
+plots.list <- paste(files.dir, plots.list, sep = "/")
+```
+
+```{r, echo=FALSE, fig.height = 8, fig.width=18, out.width = '95%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+
+### VERTEBRATES
+plots.list.bis <- plots.list[grep("mouse|baboon|rat|zebrafish", plots.list)]
+plots.list.tmp <- gsub("^.*\\RATIO","",plots.list.bis)
+plots.list.tmp.duplic <- plyr::count(plots.list.tmp)
+plots.list.tmp.duplic <- subset(plots.list.tmp.duplic, freq == 2)
+plots.list.tmp.duplic <- plots.list.tmp.duplic$x
+plots.list.tmp.uniq <- setdiff(plots.list.tmp, plots.list.tmp.duplic)
+
+nb.plots.1 <- length(plots.list.tmp.duplic)
+if (nb.plots.1 > 0) {
+  for (i in 1:nb.plots.1) {
+  
+  fig.file <- plots.list.bis[grep(plots.list.tmp.duplic[i], plots.list.bis)]
+  fig1 <- readRDS(fig.file[1])
+  fig2 <- readRDS(fig.file[2])
+  
+  double.plot <- ggdraw() +
+    draw_plot(fig1, 
+              x = 0, width = 0.5) +
+    draw_plot(fig2, 
+              x = 0.5, width = 0.5) 
+  print(double.plot)
+  key <- paste("**Fig. S", i, "**", sep="")
+  cat(key)
+  }
+}
+
+```
+
+
+```{r, echo=FALSE, fig.height = 8, fig.width = 9, out.width = '48%', fig.align = "center", comment=NA, include=TRUE, results='asis'}
+
+for (i in 1:length(plots.list.tmp.uniq)) {
+  
+  fig.file <- plots.list.bis[grep(plots.list.tmp.uniq[i], plots.list.bis)]
+  fig <- readRDS(fig.file)
+  print(fig)
+  key <- paste("**Fig. S", i+nb.plots.1, "**", sep="")
+  cat(key) 
+}
+
+```
+
